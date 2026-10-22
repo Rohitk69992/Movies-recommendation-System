@@ -1,0 +1,22 @@
+{
+  "timestamp": "2026-10-22T12:25:43.084860",
+  "dataset_rows": 4800,
+  "vocabulary_size": 5000,
+  "max_features": 5000,
+  "stemming_applied": true,
+  "merge_strategy": "id",
+  "matrix_shape": [
+    4800,
+    5000
+  ],
+  "matrix_sparsity_percent": 99.39,
+  "test_query": "The Dark Knight",
+  "test_recommendations": [
+    "The Dark Knight Rises",
+    "Batman Begins",
+    "Batman Returns",
+    "Batman Forever",
+    "Batman"
+  ],
+  "build_duration_seconds": 15.84
+}

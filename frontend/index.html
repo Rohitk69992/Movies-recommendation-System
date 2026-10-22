@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineMatch — TMDB Content-Based Movie Recommendation Engine</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Masthead Navigation -->
+  <header class="masthead">
+    <div class="masthead-container">
+      <div class="masthead-brand">
+        <span class="masthead-mark">CM</span>
+        <div class="masthead-titles">
+          <h1 class="brand-title">CINEMATCH</h1>
+          <span class="brand-tagline">TMDB Vector Space Film Discovery</span>
+        </div>
+      </div>
+      <nav class="masthead-nav">
+        <button class="nav-link active" data-tab="tab-discovery">Film Discovery</button>
+        <button class="nav-link" data-tab="tab-corpus">Corpus Analysis</button>
+        <button class="nav-link" data-tab="tab-methodology">Methodology</button>
+        <button class="nav-link" data-tab="tab-architecture">System Specs</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Viewport -->
+  <main class="viewport-container">
+
+    <!-- TAB 1: FILM DISCOVERY (RECOMMENDER) -->
+    <section id="tab-discovery" class="tab-view active">
+      
+      <!-- Query / Discovery Header -->
+      <section class="discovery-header">
+        <div class="editorial-badge">Content-Based Vector Space Retrieval</div>
+        <h2 class="editorial-headline">Discover Cinema Through Structural Content Similarity</h2>
+        <p class="editorial-deck">Query 4,800 canonical feature films mapped into a 5,000-dimensional unigram vocabulary across synopses, genres, directors, cast, and keywords.</p>
+
+        <!-- Search Bar with Autocomplete -->
+        <div class="search-module">
+          <div class="search-input-wrapper">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input 
+              type="text" 
+              id="movie-search-input" 
+              placeholder="Search by title (e.g., The Dark Knight, Inception, Gladiator, Pulp Fiction)..." 
+              autocomplete="off"
+              spellcheck="false"
+            >
+            <button id="btn-recommend" class="btn-action">Discover Matches</button>
+          </div>
+          <div id="autocomplete-dropdown" class="autocomplete-menu hidden"></div>
+        </div>
+
+        <!-- Curated Query Links -->
+        <div class="curated-links">
+          <span class="curated-label">Curated reference films:</span>
+          <div class="curated-pills">
+            <button class="film-pill" data-title="The Dark Knight">The Dark Knight</button>
+            <button class="film-pill" data-title="Inception">Inception</button>
+            <button class="film-pill" data-title="Interstellar">Interstellar</button>
+            <button class="film-pill" data-title="Avatar">Avatar</button>
+            <button class="film-pill" data-title="The Avengers">The Avengers</button>
+            <button class="film-pill" data-title="Pulp Fiction">Pulp Fiction</button>
+            <button class="film-pill" data-title="Gladiator">Gladiator</button>
+            <button class="film-pill" data-title="The Matrix">The Matrix</button>
+          </div>
+        </div>
+
+        <!-- Discovery Controls -->
+        <div class="discovery-controls">
+          <div class="control-group">
+            <label for="k-slider">Top-K Recommendations: <span id="k-val-display" class="mono-badge">5</span></label>
+            <input type="range" id="k-slider" min="3" max="10" value="5" step="1">
+          </div>
+          <div class="control-group checkbox-group">
+            <label class="custom-toggle">
+              <input type="checkbox" id="toggle-explanations" checked>
+              <span class="toggle-slider"></span>
+              <span class="toggle-label">Show shared lexical attributes</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- Processing State -->
+      <div id="loading-spinner" class="state-container hidden">
+        <div class="editorial-spinner"></div>
+        <p class="state-text">Calculating normalized inner product across 4,800 feature vectors...</p>
+      </div>
+
+      <!-- Error State -->
+      <div id="error-message" class="state-container alert-state hidden"></div>
+
+      <!-- Selected Movie Dossier (Hero Profile) -->
+      <section id="selected-movie-section" class="film-dossier hidden">
+        <div class="dossier-grid">
+          <div class="dossier-poster-frame">
+            <img id="hero-poster-img" src="" alt="Film Poster" class="dossier-poster">
+          </div>
+          <div class="dossier-content">
+            <div class="dossier-meta-bar">
+              <span id="hero-year" class="meta-tag">Year</span>
+              <span class="meta-divider">&bull;</span>
+              <span id="hero-rating" class="meta-tag rating-tag">Rating</span>
+              <span class="meta-divider">&bull;</span>
+              <div id="hero-genres" class="dossier-genres"></div>
+            </div>
+            <h2 id="hero-movie-title" class="dossier-title">Film Title</h2>
+            <div class="dossier-credits">
+              <div class="credit-row">
+                <span class="credit-label">Director</span>
+                <span id="hero-director" class="credit-value">Director Name</span>
+              </div>
+              <div class="credit-row">
+                <span class="credit-label">Starring</span>
+                <span id="hero-cast" class="credit-value">Cast Members</span>
+              </div>
+            </div>
+            <div class="dossier-synopsis">
+              <h4 class="synopsis-heading">Narrative Synopsis</h4>
+              <p id="hero-synopsis" class="synopsis-body">Plot overview text.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Recommendations Results Section -->
+      <section id="recommendations-section" class="results-section hidden">
+        <div class="results-header">
+          <div>
+            <h3 class="results-title">Content-Similar Titles</h3>
+            <p class="results-subtitle">Ranked by pairwise cosine similarity against query feature vector</p>
+          </div>
+          <span id="results-count" class="results-badge">K=5 Titles</span>
+        </div>
+
+        <div id="recommendations-grid" class="cards-layout">
+          <!-- Cards injected dynamically via app.js -->
+        </div>
+      </section>
+    </section>
+
+    <!-- TAB 2: CORPUS ANALYSIS & EDA -->
+    <section id="tab-corpus" class="tab-view">
+      <div class="editorial-view-header">
+        <div class="editorial-badge">Data Engineering & Verification</div>
+        <h2 class="editorial-headline">TMDB 5000 Corpus Diagnostics</h2>
+        <p class="editorial-deck">Empirical quality audit and distribution analysis across 4,803 canonical motion pictures.</p>
+      </div>
+
+      <div class="corpus-grid">
+        <article class="corpus-card">
+          <div class="corpus-visual">
+            <img src="/reports/eda/01_missing_values.png" alt="Missing values chart" loading="lazy">
+          </div>
+          <div class="corpus-annotation">
+            <span class="corpus-index">FIGURE 01</span>
+            <h4>Missing Values & Null Sparsity</h4>
+            <p>While optional web URLs (homepage 64.4%) exhibited high nullity, core content attributes—title, genres, cast, crew, and keywords—showed 0% missingness, with only 3 records lacking synopsis text.</p>
+          </div>
+        </article>
+
+        <article class="corpus-card">
+          <div class="corpus-visual">
+            <img src="/reports/eda/02_top_genres.png" alt="Genre distribution" loading="lazy">
+          </div>
+          <div class="corpus-annotation">
+            <span class="corpus-index">FIGURE 02</span>
+            <h4>Genre Representation Frequency</h4>
+            <p>Drama (2,297 titles) and Comedy (1,722 titles) constitute the primary structural classes, followed by Thriller (1,274) and Action (1,154), with an average of 2.53 genres per feature.</p>
+          </div>
+        </article>
+
+        <article class="corpus-card">
+          <div class="corpus-visual">
+            <img src="/reports/eda/03_release_years.png" alt="Release year distribution" loading="lazy">
+          </div>
+          <div class="corpus-annotation">
+            <span class="corpus-index">FIGURE 03</span>
+            <h4>Temporal Distribution (1916 – 2017)</h4>
+            <p>Catalog release years span a century of filmmaking, with 75% of the corpus concentrated between 1995 and 2016, establishing modern vocabulary density.</p>
+          </div>
+        </article>
+
+        <article class="corpus-card">
+          <div class="corpus-visual">
+            <img src="/reports/eda/04_vote_distribution.png" alt="Rating distribution" loading="lazy">
+          </div>
+          <div class="corpus-annotation">
+            <span class="corpus-index">FIGURE 04</span>
+            <h4>Community Rating Topology</h4>
+            <p>User vote averages exhibit a Gaussian distribution centered at 6.09 ± 1.19 on a 10-point scale, demonstrating unbiased community assessment.</p>
+          </div>
+        </article>
+
+        <article class="corpus-card">
+          <div class="corpus-visual">
+            <img src="/reports/eda/05_tag_length_distribution.png" alt="Tag length distribution" loading="lazy">
+          </div>
+          <div class="corpus-annotation">
+            <span class="corpus-index">FIGURE 05</span>
+            <h4>Plot Lexicon Word Length</h4>
+            <p>Plot overviews feature a median length of 54.2 words, yielding rich lexical context after English stopword removal and Porter stem reduction.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- TAB 3: VECTOR METHODOLOGY -->
+    <section id="tab-methodology" class="tab-view">
+      <div class="editorial-view-header">
+        <div class="editorial-badge">Machine Learning Formulation</div>
+        <h2 class="editorial-headline">Vector Space Model & Recommendation Pipeline</h2>
+        <p class="editorial-deck">A mathematically rigorous reconstruction of the CampusX content-based recommendation architecture.</p>
+      </div>
+
+      <div class="methodology-essay">
+        <div class="methodology-stage">
+          <span class="stage-num">01</span>
+          <div class="stage-body">
+            <h3>Multi-Field Metadata Extraction</h3>
+            <p>We extract five discrete content fields from TMDB raw metadata: genres, narrative keywords, top-3 billed cast members, and the film director (isolated via <code>crew.job == 'Director'</code>). Secondary crew roles are omitted to preserve high semantic signal-to-noise ratio.</p>
+          </div>
+        </div>
+
+        <div class="methodology-stage">
+          <span class="stage-num">02</span>
+          <div class="stage-body">
+            <h3>Entity Space Whitespace Collapse</h3>
+            <p>Multi-word entity names undergo whitespace collapse (e.g., <code>"Christopher Nolan" &rarr; "ChristopherNolan"</code>, <code>"Sam Worthington" &rarr; "SamWorthington"</code>). This prevents unigram bag-of-words tokenizers from conflating distinct individuals sharing common first or last names.</p>
+          </div>
+        </div>
+
+        <div class="methodology-stage">
+          <span class="stage-num">03</span>
+          <div class="stage-body">
+            <h3>Tag Synthesis & Morphological Porter Stemming</h3>
+            <p>The consolidated tag string fuses narrative synopsis, entity tokens, and thematic keywords. Tokens are normalized using NLTK's Porter Stemmer algorithm (e.g., <code>"danced" &rarr; "danc"</code>, <code>"actions" &rarr; "action"</code>), collapsing inflectional variants to common morphological roots.</p>
+          </div>
+        </div>
+
+        <div class="methodology-stage">
+          <span class="stage-num">04</span>
+          <div class="stage-body">
+            <h3>Unigram Vectorization & Sparse Matrix Projection</h3>
+            <p>Scikit-Learn's <code>CountVectorizer(max_features=5000, stop_words='english')</code> projects the corpus into a 4,800 &times; 5,000 feature matrix. The resulting representation exhibits 99.39% sparsity, stored compactly in compressed sparse column format.</p>
+          </div>
+        </div>
+
+        <div class="methodology-stage">
+          <span class="stage-num">05</span>
+          <div class="stage-body">
+            <h3>Pairwise Cosine Metric & Sub-10ms Inference</h3>
+            <p>Similarity between query vector <em>u</em> and candidate vector <em>v</em> is computed via normalized dot product:</p>
+            <div class="equation-box">
+              cos(u, v) = (u &middot; v) / (||u||<sub>2</sub> &times; ||v||<sub>2</sub>)
+            </div>
+            <p>The query movie self-score (cosine = 1.0) is masked, and candidate films are sorted descending. Online inference computes scores against all 4,800 catalog vectors in under 7 milliseconds.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: SYSTEM ARCHITECTURE & DIAGNOSTICS -->
+    <section id="tab-architecture" class="tab-view">
+      <div class="editorial-view-header">
+        <div class="editorial-badge">Production Architecture</div>
+        <h2 class="editorial-headline">System Specifications & Telemetry</h2>
+        <p class="editorial-deck">Real-time status of the FastAPI inference engine, serialized artifacts, and image delivery pipeline.</p>
+      </div>
+
+      <div class="specs-dashboard">
+        <div class="telemetry-card">
+          <span class="telemetry-label">Film Catalog Size</span>
+          <span id="spec-catalog" class="telemetry-value">4,800</span>
+          <span class="telemetry-note">Deduplicated canonical TMDB titles</span>
+        </div>
+
+        <div class="telemetry-card">
+          <span class="telemetry-label">Feature Vocabulary</span>
+          <span id="spec-vocab" class="telemetry-value">5,000</span>
+          <span class="telemetry-note">Stemmed unigrams (CountVectorizer)</span>
+        </div>
+
+        <div class="telemetry-card">
+          <span class="telemetry-label">Matrix Sparsity</span>
+          <span id="spec-sparsity" class="telemetry-value">99.39%</span>
+          <span class="telemetry-note">Compressed Sparse Row (CSR) format</span>
+        </div>
+
+        <div class="telemetry-card">
+          <span class="telemetry-label">Mean Inference Latency</span>
+          <span id="spec-latency" class="telemetry-value">6.26 ms</span>
+          <span class="telemetry-note">Sub-10ms cosine projection time</span>
+        </div>
+
+        <div class="telemetry-card">
+          <span class="telemetry-label">Poster Delivery</span>
+          <span id="spec-poster-pipeline" class="telemetry-value">TMDB CDN</span>
+          <span class="telemetry-note">4,593 verified paths (95.7% coverage)</span>
+        </div>
+
+        <div class="telemetry-card">
+          <span class="telemetry-label">Serving Architecture</span>
+          <span class="telemetry-value">FastAPI + Async</span>
+          <span class="telemetry-note">Pure HTML5/CSS3 frontend</span>
+        </div>
+      </div>
+
+      <div class="specs-details-box">
+        <h4>Model Artifact Verification</h4>
+        <ul class="artifact-list">
+          <li><code>models/movie_metadata.parquet</code> &mdash; Verified Arrow dataset containing preprocessed film metadata (218 KB)</li>
+          <li><code>models/feature_matrix.npz</code> &mdash; Serialized sparse SciPy feature matrix (4,800 &times; 5,000 unigrams, 592 KB)</li>
+          <li><code>models/count_vectorizer.joblib</code> &mdash; Serialized fitted CountVectorizer model instance (128 KB)</li>
+          <li><code>data/tmdb_poster_paths.json</code> &mdash; Direct TMDB CDN poster lookup map (4,593 high-res entries, 185 KB)</li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Restrained Editorial Footer -->
+  <footer class="colophon">
+    <div class="colophon-inner">
+      <div class="colophon-left">
+        <span class="colophon-brand">CINEMATCH</span>
+        <span class="colophon-text">&mdash; TMDB Content-Based Movie Recommendation System</span>
+      </div>
+      <div class="colophon-right">
+        <p class="tmdb-notice">This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
+        <p class="colophon-attribution">Faithful reproduction & modernization of CampusX Vector Space Methodology &bull; ML Mini-Project 2026</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>

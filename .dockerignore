@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.git
+.gitignore
+.env
+.venv
+env/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+cinematch.db
+*.sqlite3
+data/raw/*.zip

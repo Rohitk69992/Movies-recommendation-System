@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# Secrets & Environment Variables
+.env
+!.env.example
+
+# Notebook checkpoints
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Database & temp files
+*.sqlite3
+*.db
+
+# Archives & Temporary OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+archive/

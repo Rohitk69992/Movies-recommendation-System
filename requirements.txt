@@ -1,0 +1,27 @@
+# CineMatch — TMDB Content-Based Movie Recommender System
+# Dependencies
+
+# Core Scientific & ML
+numpy>=1.26.0
+pandas>=2.2.0
+scipy>=1.12.0
+scikit-learn>=1.4.0
+nltk>=3.8.0
+pyarrow>=14.0.0
+joblib>=1.3.0
+
+# Web Application UI
+streamlit>=1.30.0
+
+# Networking & Environment
+requests>=2.31.0
+python-dotenv>=1.0.0
+
+# Visualization & Reporting
+matplotlib>=3.8.0
+seaborn>=0.13.0
+nbformat>=5.9.0
+nbclient>=0.9.0
+
+# Testing
+pytest>=8.0.0
