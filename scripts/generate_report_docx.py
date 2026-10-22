@@ -1,6 +1,7 @@
 """
 CineMatch — Academic Mini Project Report DOCX Generator
 Constructs the complete editable Word Document (.docx) matching the 21-page report structure.
+Embeds LaTeX equation images, high-contrast diagrams, and complete academic theory.
 """
 
 import os
@@ -99,57 +100,37 @@ def create_docx_report():
     # -------------------------------------------------------------
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    if os.path.exists(logo_path):
-        p.add_run().add_picture(logo_path, width=Inches(1.1))
-        p.add_run("\n\n")
-    r = p.add_run("Peoples Empowerment Group’s\nISBM COLLEGE OF ENGINEERING, NANDE, PUNE\nDEPARTMENT OF ARTIFICIAL INTELLIGENCE AND DATA SCIENCE\n\n")
-    r.bold = True
+    p.add_run("Peoples Empowerment Group’s\nISBM COLLEGE OF ENGINEERING, NANDE, PUNE\nDEPARTMENT OF AI & DS\n\n").bold = True
 
     p_cert = doc.add_paragraph()
     p_cert.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r_c = p_cert.add_run("CERTIFICATE\n\n")
-    r_c.font.size = Pt(15); r_c.bold = True
+    r_cert = p_cert.add_run("CERTIFICATE\n")
+    r_cert.font.name = "Arial"; r_cert.font.size = Pt(16); r_cert.bold = True
 
-    p_cbody = doc.add_paragraph()
-    p_cbody.paragraph_format.line_spacing = 1.3
-    p_cbody.add_run(
+    doc.add_paragraph(
         "This is to certify that the Mini Project Report entitled “CineMatch: TMDB Content-Based Movie Recommendation System” "
         "submitted by Rohit Annasaheb Korade (Exam. / Roll No: 33) is a bonafide work carried out by him under the supervision of "
-        "Prof. Anil Walke and it is approved for the partial fulfilment of the requirement of Savitribai Phule Pune University "
-        "for the Mini Project in the Third Year of Artificial Intelligence and Data Science under Software Laboratory-II (317533) "
-        "in the Academic Year 2025-2026 (Semester-VI).\n\n"
+        "Prof. Anil Walke and it is approved for the partial fulfilment of the requirement of Savitribai Phule Pune University for the "
+        "Mini Project in the Third Year of Artificial Intelligence and Data Science under Software Laboratory-II (317533) in the "
+        "Academic Year 2025-2026 (Semester-VI).\n\n"
+        "Place: ISBM COE Pune\nDate: [     /     / 2026 ]\n\n"
     )
 
-    doc.add_paragraph("Place: ISBM COE Pune\nDate: [     /     / 2026 ]\n\n")
-
-    sig_tbl = doc.add_table(rows=1, cols=3)
-    sig_tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
-    sig_tbl.columns[0].width = Inches(2.2)
-    sig_tbl.columns[1].width = Inches(2.2)
-    sig_tbl.columns[2].width = Inches(2.2)
-
-    s1 = sig_tbl.cell(0, 0).paragraphs[0]
-    s1.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    s1.add_run("Prof. Anil Walke\nInternal Guide\nDept. of AI & DS").bold = True
-
-    s2 = sig_tbl.cell(0, 1).paragraphs[0]
-    s2.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    s2.add_run("Head of Department\nDept. of AI & DS\nISBM COE, Pune").bold = True
-
-    s3 = sig_tbl.cell(0, 2).paragraphs[0]
-    s3.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    s3.add_run("Principal\nISBM College of Engg.\nPune - 412115").bold = True
+    t_sig = doc.add_table(rows=1, cols=3)
+    t_sig.alignment = WD_TABLE_ALIGNMENT.CENTER
+    for col in t_sig.columns: col.width = Inches(2.2)
+    t_sig.cell(0, 0).paragraphs[0].add_run("\n\nProf. Anil Walke\nInternal Guide").bold = True
+    t_sig.cell(0, 1).paragraphs[0].add_run("\n\nHead of Department\nDept. of AI & DS").bold = True
+    t_sig.cell(0, 2).paragraphs[0].add_run("\n\nPrincipal\nISBM COE, Pune").bold = True
 
     doc.add_page_break()
 
     # -------------------------------------------------------------
     # PAGE 3: TABLE OF CONTENTS
     # -------------------------------------------------------------
-    p_toc = doc.add_paragraph()
-    p_toc.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_toc.add_run("TABLE OF CONTENTS\n\n").bold = True
-
-    toc_entries = [
+    doc.add_heading("TABLE OF CONTENTS", level=1).alignment = WD_ALIGN_PARAGRAPH.CENTER
+    toc_data = [
+        ("Sr. No.", "CONTENT", "PAGE No."),
         ("1", "ABSTRACT", "4"),
         ("2", "INTRODUCTION", "5"),
         ("3", "PROBLEM STATEMENT & REQUIREMENTS SPECIFICATION", "6"),
@@ -170,27 +151,19 @@ def create_docx_report():
         ("11", "FUTURE SCOPE", "20"),
         ("12", "REFERENCES", "21"),
     ]
-
-    toc_table = doc.add_table(rows=1, cols=3)
-    toc_table.alignment = WD_TABLE_ALIGNMENT.CENTER
-    hdr = toc_table.rows[0].cells
-    hdr[0].paragraphs[0].add_run("Sr. No.").bold = True
-    hdr[1].paragraphs[0].add_run("CONTENT").bold = True
-    hdr[2].paragraphs[0].add_run("PAGE No.").bold = True
-    set_cell_background(hdr[0], "F1F5F9"); set_cell_background(hdr[1], "F1F5F9"); set_cell_background(hdr[2], "F1F5F9")
-
-    for sr, title, pg in toc_entries:
-        row_cells = toc_table.add_row().cells
-        row_cells[0].paragraphs[0].add_run(sr).bold = bool(sr)
-        row_cells[1].paragraphs[0].add_run(title).bold = bool(sr)
-        row_cells[2].paragraphs[0].add_run(pg).bold = bool(sr)
-        row_cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        row_cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-
+    t_toc = doc.add_table(rows=len(toc_data), cols=3)
+    t_toc.alignment = WD_TABLE_ALIGNMENT.CENTER
+    for r_idx, row in enumerate(toc_data):
+        for c_idx, val in enumerate(row):
+            cell = t_toc.cell(r_idx, c_idx)
+            cell.text = val
+            if r_idx == 0:
+                set_cell_background(cell, "F1F5F9")
+                cell.paragraphs[0].runs[0].bold = True
     doc.add_page_break()
 
     # -------------------------------------------------------------
-    # CHAPTERS 1 TO 12
+    # CHAPTERS
     # -------------------------------------------------------------
     # Chapter 1
     doc.add_heading("1. ABSTRACT", level=1)
@@ -260,11 +233,16 @@ def create_docx_report():
     doc.add_heading("3. PROBLEM STATEMENT & REQUIREMENTS SPECIFICATION", level=1)
     doc.add_heading("3.1 Formal Mathematical Problem Definition", level=2)
     doc.add_paragraph(
-        "Let the catalog be Chi = {m_1, m_2, ..., m_N}, where N = 4,800 canonical catalog entries. Each movie m_i is mapped into a "
-        "5,000-dimensional feature vector u_i. The recommendation function R(m_q, K) retrieves the top-K items maximizing cosine proximity:\n\n"
-        "R(m_q, K) = argmax_{S in Chi \\ {m_q}, |S|=K} sum_{v in S} cos(u_q, v)    (3.1)\n\n"
-        "where cos(u, v) = (u . v) / (||u||_2 * ||v||_2), bounded on [0.0, 1.0]."
+        "Let the catalog be X = {m_1, m_2, ..., m_N}, where N = 4,800 canonical catalog entries. Each movie m_i is mapped into a "
+        "5,000-dimensional feature vector u_i in R^V. The recommendation function R(m_q, K) retrieves the top-K items maximizing cosine proximity:"
     )
+    if os.path.exists("reports/figures/math/eq_3_1.png"):
+        p_eq = doc.add_paragraph(); p_eq.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_eq.add_run().add_picture("reports/figures/math/eq_3_1.png", width=Inches(5.5))
+    if os.path.exists("reports/figures/math/eq_3_2.png"):
+        p_eq = doc.add_paragraph(); p_eq.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_eq.add_run().add_picture("reports/figures/math/eq_3_2.png", width=Inches(5.5))
+
     doc.add_heading("3.2 Functional Requirements", level=2)
     doc.add_paragraph(
         "• FR-1: Relational Metadata Ingestion on primary key id == movie_id.\n"
@@ -315,11 +293,16 @@ def create_docx_report():
         "false unigram co-occurrence links between distinct individuals sharing common names."
     )
     doc.add_heading("5.3 Vector Space Model Equations", level=2)
-    doc.add_paragraph(
-        "TF(t, d) = f_{t, d}    (5.1)\n"
-        "u = [TF(t_1, d), TF(t_2, d), ..., TF(t_5000, d)]^T    (5.2)\n"
-        "cos(u, v) = (u . v) / (||u||_2 * ||v||_2)    (5.3)"
-    )
+    if os.path.exists("reports/figures/math/eq_5_1.png"):
+        p_eq = doc.add_paragraph(); p_eq.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_eq.add_run().add_picture("reports/figures/math/eq_5_1.png", width=Inches(2.5))
+    if os.path.exists("reports/figures/math/eq_5_2.png"):
+        p_eq = doc.add_paragraph(); p_eq.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_eq.add_run().add_picture("reports/figures/math/eq_5_2.png", width=Inches(4.5))
+    if os.path.exists("reports/figures/math/eq_5_3.png"):
+        p_eq = doc.add_paragraph(); p_eq.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_eq.add_run().add_picture("reports/figures/math/eq_5_3.png", width=Inches(5.5))
+
     doc.add_heading("5.4 High-Dimensional Matrix Sparsity (99.39%)", level=2)
     doc.add_paragraph(
         "Across the 4,800 x 5,000 feature matrix, only 146,805 non-zero entries exist out of 24,000,000 elements (99.39% sparsity). "
@@ -335,9 +318,13 @@ def create_docx_report():
         "normalizing synopsis lengths via L2 unit-norm scaling."
     )
     doc.add_heading("6.2 Mathematical Properties of Cosine Space", level=2)
-    doc.add_paragraph(
-        "The metric satisfies Reflexivity (cos(u, u) = 1.0), Symmetry (cos(u, v) = cos(v, u)), and Non-Negative Boundedness [0.0, 1.0]."
-    )
+    if os.path.exists("reports/figures/math/eq_6_1.png"):
+        p_eq = doc.add_paragraph(); p_eq.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_eq.add_run().add_picture("reports/figures/math/eq_6_1.png", width=Inches(5.0))
+    if os.path.exists("reports/figures/math/eq_6_2.png"):
+        p_eq = doc.add_paragraph(); p_eq.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_eq.add_run().add_picture("reports/figures/math/eq_6_2.png", width=Inches(5.0))
+
     doc.add_heading("6.3 Sparsity Exploitation & Sublinear Matrix Dot-Product", level=2)
     doc.add_paragraph(
         "Pre-normalizing catalog vectors simplifies inference to a single sparse matrix-vector dot product: s = A u_q, completing in 6.14 ms on CPU."
@@ -348,153 +335,113 @@ def create_docx_report():
     doc.add_heading("7. MODEL BUILDING & TRAINING WORKFLOW", level=1)
     doc.add_heading("7.1 Offline Vectorizer Fitting & Vocabulary Construction", level=2)
     doc.add_paragraph(
-        "Scikit-Learn's CountVectorizer builds a 5,000 unigram vocabulary across 4,800 films, completing training in 9.4 seconds on an Intel i7 CPU."
+        "Model training executes via python -m src.train in 9.4 seconds on an Intel Core i7 CPU. Artifacts are serialized into models/ "
+        "totaling 3.03 MB (movie_metadata.parquet at 2.61 MB, feature_matrix.npz at 295 KB, and count_vectorizer.joblib at 141 KB)."
     )
-    doc.add_heading("7.2 Offline Model Serialization Pipeline", level=2)
+    doc.add_heading("7.2 Unit Testing & Integrity Validation Harness", level=2)
     doc.add_paragraph(
-        "Artifacts serialized in models/: movie_metadata.parquet (2.61 MB), feature_matrix.npz (295 KB), count_vectorizer.joblib (141 KB), "
-        "and training_metadata.json (1.45 KB). Total disk footprint: 3.03 MB (eliminating 185 MB dense similarity pickles)."
-    )
-    doc.add_heading("7.3 Automated Verification Test Suite", level=2)
-    doc.add_paragraph(
-        "An automated 29-test verification harness (pytest tests -v) guarantees 100% pass rate in 5.24 seconds across loaders, preprocessing, "
-        "vectorizer dimensions, self-exclusion masking, and REST endpoints."
+        "An automated 29-test verification suite (pytest tests -v) validates data loader integrity, preprocessing whitespace collapse, "
+        "Porter stemming, vectorizer dimensionality, self-exclusion masking, and FastAPI REST endpoints with 100% pass rate in 5.24s."
     )
     doc.add_page_break()
 
     # Chapter 8
     doc.add_heading("8. IMPLEMENTATION DETAILS — TOOLS & SOURCE CODE", level=1)
-    doc.add_heading("8.1 Software Stack & Environment", level=2)
-    doc.add_paragraph(
-        "Verified software: Python 3.11.9, Scikit-Learn 1.8.0, FastAPI, Uvicorn, NumPy, SciPy Sparse, PyArrow, NLTK."
-    )
-    doc.add_heading("8.2 Core Source Code Excerpts", level=2)
-    doc.add_paragraph(
-        "src/preprocessing.py:\n"
-        "def collapse_spaces(names):\n"
-        "    return [name.replace(' ', '') for name in names if isinstance(name, str)]\n\n"
-        "src/recommender.py:\n"
-        "def recommend(query_id, top_k=5):\n"
-        "    idx = movie_to_index[query_id]\n"
-        "    scores = cosine_similarity(feature_matrix[idx], feature_matrix).flatten()\n"
-        "    scores[idx] = -1.0  # Mask self-score\n"
-        "    return sorted(np.argpartition(scores, -top_k)[-top_k:], key=lambda i: scores[i], reverse=True)"
-    )
-    doc.add_page_break()
-
-    # Chapter 8 Diagrams
-    doc.add_heading("8.3 & 8.4 System Architecture & Operational Workflow Diagrams", level=1)
+    doc.add_heading("8.1 System Architecture Diagram", level=2)
     if os.path.exists("reports/figures/01_system_architecture.png"):
-        p_img1 = doc.add_paragraph()
-        p_img1.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p_img1.add_run().add_picture("reports/figures/01_system_architecture.png", width=Inches(5.6))
-        doc.add_paragraph("Figure 8.1: CineMatch Multi-Layer System Architecture").alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img = doc.add_paragraph(); p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img.add_run().add_picture("reports/figures/01_system_architecture.png", width=Inches(6.2))
+        doc.add_paragraph("Figure 8.1: System Architecture Diagram of the CineMatch Recommendation Platform").alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    doc.add_heading("8.2 Operational Flowchart Diagram", level=2)
     if os.path.exists("reports/figures/02_operational_workflow.png"):
-        p_img2 = doc.add_paragraph()
-        p_img2.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p_img2.add_run().add_picture("reports/figures/02_operational_workflow.png", width=Inches(5.6))
-        doc.add_paragraph("Figure 8.2: End-to-End Operational Workflow Diagram").alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img = doc.add_paragraph(); p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img.add_run().add_picture("reports/figures/02_operational_workflow.png", width=Inches(6.2))
+        doc.add_paragraph("Figure 8.2: End-to-End Operational Flowchart of Query Execution and Poster Delivery").alignment = WD_ALIGN_PARAGRAPH.CENTER
     doc.add_page_break()
 
-    # Chapter 9 - UI
+    # Chapter 9
     doc.add_heading("9. RESULTS AND ANALYSIS", level=1)
-    doc.add_heading("9.1 Application Outputs & User Interface Demonstrations", level=2)
-    doc.add_paragraph(
-        "The single-page web client delivers a cinema-editorial visual identity with warm charcoal surfaces, serif display typography, "
-        "and strict 2:3 ratio posters."
-    )
+    doc.add_heading("9.1 Web User Interface Demonstrations", level=2)
     if os.path.exists("reports/figures/05_app_demo_search.png"):
-        p_img1 = doc.add_paragraph()
-        p_img1.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p_img1.add_run().add_picture("reports/figures/05_app_demo_search.png", width=Inches(5.5))
-        doc.add_paragraph("Figure 9.1: CineMatch Search Header & Selected Film Dossier").alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img = doc.add_paragraph(); p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img.add_run().add_picture("reports/figures/05_app_demo_search.png", width=Inches(5.8))
+        doc.add_paragraph("Figure 9.1: CineMatch Search Header, Autocomplete & Selected Film Dossier").alignment = WD_ALIGN_PARAGRAPH.CENTER
     if os.path.exists("reports/figures/06_app_demo_recommendations.png"):
-        p_img2 = doc.add_paragraph()
-        p_img2.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p_img2.add_run().add_picture("reports/figures/06_app_demo_recommendations.png", width=Inches(5.5))
-        doc.add_paragraph("Figure 9.2: Recommendations Output Grid with Genuine Posters & Cosine Scores").alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img = doc.add_paragraph(); p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img.add_run().add_picture("reports/figures/06_app_demo_recommendations.png", width=Inches(5.8))
+        doc.add_paragraph("Figure 9.2: Recommendations Output Grid with 2:3 High-Res Posters & Cosine Scores").alignment = WD_ALIGN_PARAGRAPH.CENTER
     doc.add_page_break()
 
-    # Chapter 9 - Telemetry
-    doc.add_heading("9.1.3 Backend Server Logging & Execution Telemetry", level=1)
-    doc.add_paragraph(
-        "Figure 9.3 displays authentic Uvicorn console logging showing sub-7ms query execution and top-5 output metrics."
-    )
+    # Server Logging
+    doc.add_heading("9.1.3 Backend Server Logging & Execution Telemetry", level=2)
     if os.path.exists("reports/figures/07_terminal_telemetry.png"):
-        p_img = doc.add_paragraph()
-        p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p_img.add_run().add_picture("reports/figures/07_terminal_telemetry.png", width=Inches(5.5))
-        doc.add_paragraph("Figure 9.3: Terminal Console Execution Trace Showing Real-Time Latency Telemetry").alignment = WD_ALIGN_PARAGRAPH.CENTER
-    doc.add_heading("9.1.5 Real-Time Pipeline Latency Decomposition", level=2)
-    doc.add_paragraph(
-        "End-to-end latency: 0.12 ms title inverted index lookup + 5.86 ms sparse BLAS dot-product + 0.28 ms argpartition top-5 sort = 6.26 ms total."
-    )
+        p_img = doc.add_paragraph(); p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img.add_run().add_picture("reports/figures/07_terminal_telemetry.png", width=Inches(6.0))
+        doc.add_paragraph("Figure 9.3: Terminal Console Execution Trace Showing Sub-7ms Latency Telemetry").alignment = WD_ALIGN_PARAGRAPH.CENTER
     doc.add_page_break()
 
-    # Chapter 9 - Evaluation
-    doc.add_heading("9.2 Model Performance Evaluation & Metric Comparison", level=1)
-    doc.add_paragraph(
-        "Empirical benchmarks across 150 queries establish 100% self-exclusion compliance, 100% duplicate-free sets, 48.27% genre overlap, "
-        "and 11.98% catalog coverage."
-    )
+    # Quantitative Evaluation
+    doc.add_heading("9.2 Quantitative Performance Evaluation & Metric Comparison", level=2)
     if os.path.exists("reports/figures/03_model_evaluation_metrics.png"):
-        p_img = doc.add_paragraph()
-        p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img = doc.add_paragraph(); p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
         p_img.add_run().add_picture("reports/figures/03_model_evaluation_metrics.png", width=Inches(5.5))
-        doc.add_paragraph("Figure 9.4: Quantitative Evaluation Metrics on TMDB Benchmark").alignment = WD_ALIGN_PARAGRAPH.CENTER
+        doc.add_paragraph("Figure 9.4: Graphical Representation of Quantitative Evaluation Metrics on TMDB Benchmark").alignment = WD_ALIGN_PARAGRAPH.CENTER
     doc.add_page_break()
 
-    # Chapter 9 - Distributions
-    doc.add_heading("9.3 Graphical Representation (Genre Breakdown & Word Length)", level=1)
+    # Corpus Distributions
+    doc.add_heading("9.3 Corpus Distributions & Exploratory Analysis", level=2)
     if os.path.exists("reports/eda/02_top_genres.png"):
-        p_img1 = doc.add_paragraph()
-        p_img1.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p_img1.add_run().add_picture("reports/eda/02_top_genres.png", width=Inches(5.2))
-        doc.add_paragraph("Figure 9.5: Frequency Distribution of Top Movie Genres").alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img = doc.add_paragraph(); p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img.add_run().add_picture("reports/eda/02_top_genres.png", width=Inches(5.5))
+        doc.add_paragraph("Figure 9.5: Frequency Distribution of Top Movie Genres across 4,800 Catalog Titles").alignment = WD_ALIGN_PARAGRAPH.CENTER
     if os.path.exists("reports/eda/05_tag_length_distribution.png"):
-        p_img2 = doc.add_paragraph()
-        p_img2.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p_img2.add_run().add_picture("reports/eda/05_tag_length_distribution.png", width=Inches(5.2))
-        doc.add_paragraph("Figure 9.6: Plot Overview Word Length Distribution (Mean = 54.2)").alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img = doc.add_paragraph(); p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img.add_run().add_picture("reports/eda/05_tag_length_distribution.png", width=Inches(5.5))
+        doc.add_paragraph("Figure 9.6: Distribution of Plot Overview Word Lengths across TMDB Catalog (Mean = 54.2 words)").alignment = WD_ALIGN_PARAGRAPH.CENTER
     doc.add_page_break()
 
-    # Chapter 9 - Example Recommendations
-    doc.add_heading("9.4 Example Recommendations & Confidence Validation", level=1)
-    doc.add_paragraph(
-        "Verified model predictions confirm strong semantic clustering for The Dark Knight (The Dark Knight Rises 0.423, Batman Begins 0.402), "
-        "Inception (12 Rounds 0.241, RED 0.238), The Avengers (Iron Man 3 0.412), and The Matrix (The Matrix Revolutions 0.425)."
-    )
+    # Predictions
+    doc.add_heading("9.4 Example Recommendations & Confidence Validation", level=2)
     if os.path.exists("reports/figures/04_cosine_score_distribution.png"):
-        p_img = doc.add_paragraph()
-        p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img = doc.add_paragraph(); p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
         p_img.add_run().add_picture("reports/figures/04_cosine_score_distribution.png", width=Inches(5.5))
-        doc.add_paragraph("Figure 9.7: Empirical Cosine Similarity Score Distribution (Mean = 0.342)").alignment = WD_ALIGN_PARAGRAPH.CENTER
+        doc.add_paragraph("Figure 9.7: Empirical Cosine Similarity Score Distribution Across Benchmark Recommendations").alignment = WD_ALIGN_PARAGRAPH.CENTER
     doc.add_page_break()
 
-    # Chapter 9 - Observations
-    doc.add_heading("9.5 Observations, Error Analysis & Hardware Benchmarks", level=1)
+    # Observations & Hardware
+    doc.add_heading("9.5 Observations, Error Analysis & Hardware Benchmarks", level=2)
     doc.add_paragraph(
-        "Observations confirm franchise and directorial coherence, entity space stability, and sub-10ms latency consistency. "
-        "Limitations include filter bubble over-specialization and closed-world catalog boundaries. Table 9.3 profiles execution resources."
+        "• Franchise and Directorial Coherence: Captures trilogy continuity (Nolan Batman scores > 0.40).\n"
+        "• Entity Disambiguation Efficacy: Space collapse prevents cross-actor unigram contamination.\n"
+        "• Latency Consistency: Strictly sub-10ms query execution across 4,800 catalog vectors on commodity CPU.\n"
+        "• Limitations: Closed-world boundary (4,800 films) and filter-bubble metadata confinement."
     )
     doc.add_page_break()
 
     # Chapter 10
     doc.add_heading("10. CONCLUSION", level=1)
     doc.add_paragraph(
-        "CineMatch demonstrates that pairing entity-collapsed Bag-of-Words unigrams with normalized cosine metrics delivers transparent, "
-        "reproducible, and computationally sustainable movie recommendations. With 6.26 ms latency and 3.03 MB storage footprint, "
-        "classical machine learning proves ideal for enterprise media retrieval."
+        "This undergraduate machine learning mini-project successfully engineered, evaluated, and deployed CineMatch, "
+        "an end-to-end content-based movie recommendation system operating on the canonical TMDB 5000 dataset. By applying rigorous data "
+        "engineering, entity space normalization, morphological stemming, and vector space modeling, the project demonstrates that high-dimensional "
+        "linear vector representations deliver state-of-the-art computational efficiency and highly consistent thematic movie recommendations."
     )
     doc.add_page_break()
 
     # Chapter 11
     doc.add_heading("11. FUTURE SCOPE", level=1)
     doc.add_paragraph(
-        "Future enhancements include: (1) Dense Sentence-BERT embeddings; (2) Hybrid collaborative-content filtering; "
-        "(3) Dynamic in-session user profiling; (4) Maximal Marginal Relevance diversity re-ranking; (5) Explainable AI attribution; "
-        "and (6) WebAssembly edge deployment."
+        "1. Dense Semantic Embeddings (Sentence-Transformers / MiniLM)\n"
+        "2. Hybrid Collaborative-Content Integration (MovieLens user-item ratings)\n"
+        "3. Dynamic User Profiling & In-Session Mood Tracking\n"
+        "4. Diversity-Aware Re-ranking via Maximal Marginal Relevance (MMR)\n"
+        "5. Explainable AI (XAI) Token Attribution (LIME / SHAP for text)\n"
+        "6. In-Browser Edge Deployment via WebAssembly (WASM) / ONNX Runtime."
     )
+    if os.path.exists("reports/figures/math/eq_11_1.png"):
+        p_eq = doc.add_paragraph(); p_eq.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_eq.add_run().add_picture("reports/figures/math/eq_11_1.png", width=Inches(5.5))
     doc.add_page_break()
 
     # Chapter 12
@@ -503,21 +450,21 @@ def create_docx_report():
         "1. Salton, G., & Buckley, C. (1988). Term-weighting approaches in automatic text retrieval. Information Processing & Management, 24(5), pp. 513–523.",
         "2. Manning, C. D., Raghavan, P., & Schütze, H. (2008). Introduction to Information Retrieval. Cambridge University Press, Cambridge, UK.",
         "3. Pedregosa, F., et al. (2011). Scikit-learn: Machine Learning in Python. Journal of Machine Learning Research (JMLR), 12, pp. 2825–2830.",
-        "4. Porter, M. F. (1980). An algorithm for suffix stripping. Program: Electronic Library and Information Systems, 14(3), pp. 130–137.",
-        "5. The Movie Database (TMDB). (2024). TMDB API Documentation and Developer Reference. Available: https://developer.themoviedb.org/docs.",
-        "6. Kaggle. (2017). TMDB 5000 Movie Dataset. Available: https://www.kaggle.com/datasets/tmdb/tmdb-movie-metadata.",
-        "7. Ricci, F., Rokach, L., & Shapira, B. (2015). Recommender Systems Handbook (2nd ed.), Springer, Boston, MA, pp. 1–35.",
-        "8. Lops, P., de Gemmis, M., & Semeraro, G. (2011). Content-based Recommender Systems. In Recommender Systems Handbook, pp. 73–105.",
-        "9. Sarwar, B., et al. (2001). Item-based collaborative filtering recommendation algorithms. In Proc. 10th WWW Conf., pp. 285–295.",
+        "4. Porter, M. F. (1980). An algorithm for suffix stripping. Program, 14(3), pp. 130–137.",
+        "5. The Movie Database (TMDB). (2024). TMDB API Documentation and Developer Reference. https://developer.themoviedb.org/docs.",
+        "6. Kaggle. (2017). TMDB 5000 Movie Dataset. https://www.kaggle.com/datasets/tmdb/tmdb-movie-metadata.",
+        "7. Ricci, F., Rokach, L., & Shapira, B. (2015). Recommender Systems Handbook (2nd ed.). Springer, Boston, MA.",
+        "8. Lops, P., de Gemmis, M., & Semeraro, G. (2011). Content-based Recommender Systems: State of the Art and Trends. Springer.",
+        "9. Sarwar, B., et al. (2001). Item-based collaborative filtering recommendation algorithms. In Proc. WWW '01, pp. 285–295.",
         "10. Harris, C. R., et al. (2020). Array programming with NumPy. Nature, 585(7825), pp. 357–362.",
-        "11. McKinney, W. (2010). Data Structures for Statistical Computing in Python. In Proc. 9th Python in Science Conf., pp. 56–61.",
+        "11. McKinney, W. (2010). Data Structures for Statistical Computing in Python. In Proc. SciPy 2010, pp. 56–61.",
         "12. Virtanen, P., et al. (2020). SciPy 1.0: Fundamental Algorithms for Scientific Computing. Nature Methods, 17(3), pp. 261–272.",
         "13. Hunter, J. D. (2007). Matplotlib: A 2D Graphics Environment. Computing in Science & Engineering, 9(3), pp. 90–95.",
         "14. Waskom, M. L. (2021). Seaborn: statistical data visualization. Journal of Open Source Software, 6(60), p. 3021.",
-        "15. Ramirez, S. (2024). FastAPI: Modern, High-Performance Web Framework. Available: https://fastapi.tiangolo.com/.",
-        "16. Carbonell, J., & Goldstein, J. (1998). The use of MMR for diversity reordering. In Proc. 21st ACM SIGIR Conf., pp. 335–336.",
-        "17. Reimers, N., & Gurevych, I. (2019). Sentence-BERT: Sentence Embeddings using Siamese Networks. In Proc. EMNLP 2019, pp. 3982–3992.",
-        "18. Savitribai Phule Pune University. (2024). Third Year AI & DS Engineering Syllabus: Software Laboratory-II (317533). SPPU, Pune, India."
+        "15. Ramirez, S. (2024). FastAPI: Modern, Fast (High-Performance) Web Framework for Building APIs. https://fastapi.tiangolo.com/.",
+        "16. Carbonell, J., & Goldstein, J. (1998). The use of MMR, diversity-based reranking for reordering documents. In Proc. SIGIR '98.",
+        "17. Reimers, N., & Gurevych, I. (2019). Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks. In Proc. EMNLP '19.",
+        "18. Savitribai Phule Pune University. (2024). Third Year AI & DS Engineering Syllabus: Software Laboratory-II (317533)."
     ]
     for r in refs:
         doc.add_paragraph(r)
@@ -526,5 +473,5 @@ def create_docx_report():
     print(f"Successfully generated {output_docx}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     create_docx_report()
