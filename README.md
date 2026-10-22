@@ -99,7 +99,6 @@ CineMatch/
 │   ├── test_recommender.py
 │   ├── test_poster.py
 │   └── test_pipeline_e2e.py    # Live smoke tests on TMDB dataset
-├── .env.example                # Configuration template
 ├── .gitignore                  # Git ignore rules
 ├── pytest.ini                  # Pytest configuration
 ├── requirements.txt            # Reproducible dependencies
@@ -151,12 +150,11 @@ CineMatch implements a zero-friction, three-tiered poster delivery pipeline:
 2. **Dynamic TMDB API v3 Lookup**: If a film ID is not in the offline mapping and a `TMDB_API_KEY` is provided in `.env`, the engine queries TMDB API in real time with caching.
 3. **Intentional Typographic Archival Fallback**: For any unmapped or offline titles, the engine dynamically renders an editorial SVG film jacket featuring title, release year, and genre—with **no generic broken placeholders or play buttons**.
 
-To optionally provide an API key:
-1. Copy `.env.example` to `.env`:
-   ```bash
-   cp .env.example .env
-   ```
-2. Set your key: `TMDB_API_KEY=your_actual_key_here`.
+To optionally provide a TMDB API key:
+Create a `.env` file in the project root:
+```bash
+TMDB_API_KEY=your_actual_key_here
+```
 
 ---
 
