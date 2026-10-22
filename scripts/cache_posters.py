@@ -8,7 +8,11 @@ import time
 import urllib.request
 from typing import Set
 
-API_KEY = os.getenv("TMDB_API_KEY", "8265bd1679663a7ea12ac168da84d2e8")
+from dotenv import load_dotenv
+
+load_dotenv()
+
+API_KEY = os.getenv("TMDB_API_KEY", "").strip()
 POSTER_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "posters")
 os.makedirs(POSTER_DIR, exist_ok=True)
 
@@ -17,6 +21,9 @@ def download_poster(movie_id: int) -> bool:
     target_path = os.path.join(POSTER_DIR, f"{movie_id}.jpg")
     if os.path.exists(target_path) and os.path.getsize(target_path) > 1000:
         return True
+
+    if not API_KEY:
+        return False
 
     api_url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={API_KEY}&language=en-US"
     try:

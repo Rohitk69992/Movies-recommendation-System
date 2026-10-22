@@ -14,9 +14,6 @@ from dotenv import load_dotenv
 # Load environment variables from .env if present
 load_dotenv()
 
-# Reference TMDB API key from CampusX educational baseline
-REFERENCE_TMDB_API_KEY = "8265bd1679663a7ea12ac168da84d2e8"
-
 # In-memory cache for movie_id -> poster_url
 _POSTER_CACHE: Dict[int, Optional[str]] = {}
 
@@ -30,9 +27,8 @@ REQUEST_TIMEOUT_SECONDS = 4.0
 
 
 def get_active_tmdb_api_key() -> str:
-    """Return configured user TMDB API key or fallback to reference baseline key."""
-    env_key = os.getenv("TMDB_API_KEY", "").strip()
-    return env_key if env_key else REFERENCE_TMDB_API_KEY
+    """Return configured user TMDB API key from environment variable."""
+    return os.getenv("TMDB_API_KEY", "").strip()
 
 
 def generate_fallback_svg_raw(
