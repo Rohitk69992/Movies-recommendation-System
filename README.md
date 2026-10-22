@@ -21,7 +21,7 @@ flowchart TD
     D --> E["CountVectorizer<br/>(max_features=5000, stop_words='english')"]
     E --> F["Vector Space Model<br/>(Sparse CSR Matrix: 4800 x 5000)"]
     F --> G["Artifact Serialization<br/>- movie_metadata.parquet<br/>- feature_matrix.npz<br/>- count_vectorizer.joblib"]
-    G --> H["Streamlit Web Application<br/>(app.py)"]
+    G --> H["FastAPI Web Server & Application<br/>(server.py)"]
     H --> I["Cosine Similarity Query<br/>cos(u, v) = (u . v) / (||u|| ||v||)<br/>(Sub-10ms Latency)"]
     I --> J["Top-K Ranked Recommendations<br/>+ TMDB Poster API / Offline SVG Fallback<br/>+ Explainability Badges"]
 ```
@@ -36,8 +36,8 @@ flowchart TD
 - **Morphological Stemming**: Normalizes narrative words with NLTK's `PorterStemmer` (`"actions"` $\rightarrow$ `"action"`, `"danced"` $\rightarrow$ `"danc"`).
 - **Sub-10ms Inference**: Employs compressed sparse row (`scipy.sparse.csr_matrix`) dot products and `np.argpartition` sorting, eliminating bulky 185 MB dense matrix pickles.
 - **Resilient Poster Retrieval**: Features safe timeouts, caching, and a pure SVG vector graphic fallback when offline or lacking API keys.
-- **Interactive UI**: Responsive Streamlit application featuring film synopses, genre badges, star ratings, similarity percentage matches, and "Why Recommended" shared tag explanations.
-- **Comprehensive Quality Assurance**: 20 automated unit and integration tests with 100% pass rate.
+- **Cinematic Editorial UI**: Responsive single-page web client (HTML5/CSS3/ES6) featuring 2:3 high-res posters, live autocomplete, genuine cosine similarity metrics, and explainable shared-context tag chips.
+- **Comprehensive Quality Assurance**: 29 automated unit and integration tests with 100% pass rate.
 
 ---
 
@@ -60,7 +60,7 @@ Evaluated across 150 randomly sampled test queries ($K = 5$):
 
 ```text
 CineMatch/
-├── app.py                      # Interactive Streamlit application
+├── server.py                   # Production FastAPI server & single-page application
 ├── data/
 │   ├── raw/
 │   │   ├── tmdb_5000_movies.csv
@@ -130,10 +130,8 @@ python server.py
 ```
 Open your browser at **`http://localhost:8000`**.
 
-*(Note: If you ever need Streamlit instead, `streamlit run app.py` remains available).*
-
 ### 4. Run Automated Test Suite
-Execute the 20 unit and integration tests:
+Execute the 29 unit and integration tests:
 ```bash
 pytest tests -v
 ```

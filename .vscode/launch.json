@@ -1,0 +1,31 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run CineMatch Web Server (FastAPI)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/server.py",
+            "console": "integratedTerminal",
+            "envFile": "${workspaceFolder}/.env",
+            "justMyCode": true
+        },
+        {
+            "name": "Run All Tests (Pytest)",
+            "type": "python",
+            "request": "launch",
+            "module": "pytest",
+            "args": ["tests", "-v"],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Retrain Model Pipeline",
+            "type": "python",
+            "request": "launch",
+            "module": "src.train",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}
